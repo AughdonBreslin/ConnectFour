@@ -1,15 +1,16 @@
-##GOOD ONE USE THIS ONE THIS IS THE GOOD ONE THAT IS USABLE##
+# Aughdon Breslin #
+# Connect Four AI #
+# May 2019 #
 
 
 ##############
-##Make Board##
+# Make Board #
 ##############
-import numpy as np  # we also import random and math below
+import numpy as np
 import random
 
 mainboard = np.array
 mainboard = [[0] * 7 for x in range(6)]
-
 
 def printBoard(board):
     for i in board:
@@ -17,7 +18,7 @@ def printBoard(board):
 
 
 ##################
-##Game Mechanics##
+# Game Mechanics #
 ##################
 
 # checks if top spot in each column is open
@@ -39,7 +40,6 @@ def openRow(column, board):
 
 # put a specified piece in a specified spot
 def dropPiece(color, column, row, board):
-    # print("row",row)
     board[row][column] = color  # fix column
 
 
@@ -51,20 +51,25 @@ def playerTurn(color, board):
         print("Invalid input. Pick a valid column, Player ", color)
         move = int(input())
     dropPiece(color, move - 1, openRow(move - 1, mainboard), mainboard)
-    # board[openRow(move)][move]=color
-
     # switch between the players, printing updated board
 
-
+# Start up the whole game
 def playGame():
+    # Create the board
     printBoard(mainboard)
+    # While the game's not over
     while (won(2, mainboard) == False):
+        # Start with player 1
         playerTurn(1, mainboard)
         printBoard(mainboard)
+        
+        # Stats
         print("threes: " + str(findThrees(1, mainboard)))
         print("twos: " + str(findTwos(1, mainboard)))
         print("mids: " + str(numMiddles(1, mainboard)))
         print ("score: " + str(scoreBoard(1, 2, mainboard)))
+
+        # If the games not over, go to AI's turn
         if (won(1, mainboard) == False):
             AiTurn(2, mainboard)
             printBoard(mainboard)
@@ -72,9 +77,9 @@ def playGame():
             break
 
 
-###############
-##Win Conditions##
-###############
+##################
+# Win Conditions #
+##################
 
 def checkHorizontal(color, board):
     for r in range(0, 6):
@@ -113,29 +118,25 @@ def checkNegDiag(color, board):
 
 
 def won(color, board):
-    # or boardFull
+    # or board is full
     if (checkHorizontal(color, board) or checkVertical(color, board) or checkPosDiag(color, board) or checkNegDiag(
             color, board)):
         return True
     return False
 
 
-###############
-##Other Stuff##
-###############
+#############
+# AI's Turn #
+#############
 
 def AiTurn(color, boardy):
     column, score = miniMax(boardy, 5, True, -999999999, 9999999999)  ##ITS WINNING AT 5 FeelsBad/GoodMan##
     dropPiece(color, column, openRow(column, boardy), boardy)
 
 
-def findFours(color, board):  # might not be needed
-    pass
-
-
-##########
-##Threes##
-##########
+################
+# Check Threes #
+################
 
 # bonus points for double edged threes/twos
 def findHorThrees(color, board):
@@ -151,7 +152,6 @@ def findHorThrees(color, board):
                     chips = chips + 1
             if chips == 3 and em == 1:
                 threes = threes + 1
-
     return threes
 
 
@@ -168,12 +168,12 @@ def findVertThrees(color, board):
                     chips = chips + 1
             if chips == 3 and em == 1:
                 threes = threes + 1
-
     return threes
 
 
 def findDiagThrees(color, board):
     threes = 0
+    # Positive diagonal
     for r in range(3, 6):
         for c in range(0, 4):
             em = 0
@@ -186,6 +186,7 @@ def findDiagThrees(color, board):
             if chips == 3 and em == 1:
                 threes = threes + 1
 
+    # Negative diagonal
     for r in range(0, 3):
         for c in range(0, 4):
             em = 0
@@ -199,7 +200,7 @@ def findDiagThrees(color, board):
                 threes = threes + 1
     return threes
 
-
+# Accumulate
 def findThrees(color, board):
     blank = []
     for tup in str(findHorThrees(color, board)):
@@ -211,13 +212,12 @@ def findThrees(color, board):
     for tup in str(findDiagThrees(color, board)):
         if not tup in blank:
             blank.append(tup)
-    # print (str(len(blank)))
-    # print(""+str(findDiagThrees(color,board)[1]) +""+ str(findVertThrees(color,board)[1])+""+ str(findHorThrees(color,board)[1]))
+    
     return findDiagThrees(color, board) * 16 + findVertThrees(color, board) * 10 + findHorThrees(color, board) * 14
 
 
 ########
-##Twos##
+# Twos #
 ########
 def findHorTwos(color, board):
     twos = 0
@@ -286,7 +286,7 @@ def findTwos(color, board):
 
 
 ###################
-##Prioritizations##
+# Prioritizations #
 ###################
 def numMiddles(color, board):
     c = 3
@@ -297,9 +297,9 @@ def numMiddles(color, board):
     return mids
 
 
-##############
-##Good Stuff##
-##############
+#######################
+# Adding up the Score #
+#######################
 def scoreBoard(color, oppColor, board):
     s = 0
     # Check AI Score
@@ -323,41 +323,52 @@ def scoreBoard(color, oppColor, board):
 
 
 ##############
-##Hard Stuff##
+# MiniMaxing #
 ##############
 
 def miniMax(board, depth, maximizingPlayer, alpha, beta):
-    if depth == 0 or won(1, board) or won(2, board) or eligibleColumns(board) == []:  # if done with recursion
-        if won(1, board) or won(2, board) or eligibleColumns(board) == []:  # if we're done because the game is over
+    # Reached recursion depth or game is over
+    if depth == 0 or won(1, board) or won(2, board) or eligibleColumns(board) == []:
+        # if we're done because the game is over
+        if won(1, board) or won(2, board) or eligibleColumns(board) == []:
             if won(1, board):
-                return None, -999999999999999999999999999999999
+                return None, -999999999
             elif won(2, board):
-                return None, 999999999999999999999999999999999
+                return None, 999999999
             elif eligibleColumns(board) == []:
                 return None, 0
         else:  # if done with recursion but the game is not over
             return None, scoreBoard(2, 1, board)
-    elif maximizingPlayer:  # if the game is not over and we are not done with recursion
-        value = -999999999999999999999999999999999  # we need to improve our position, so this is the worst possible position to be in
+    # if the game is not over and we are not done with recursion,
+    # find the best possible move
+    elif maximizingPlayer:  
+        value = -999999999  # start with horrible position rating
+        # Start with a random column of the board
         position = random.randint(0, len(eligibleColumns(board)))
         for columns in eligibleColumns(board):
+            # Make a copy of the boardstate
             copy = [[0] * 7 for x in range(6)]
             for row in range(0, len(board)):
                 for col in range(0, len(board[row])):
                     copy[row][col] = board[row][col]
+            # Play on the copy
             row = openRow(columns, copy)
             dropPiece(2, columns, row, copy)
+            # Find the score of the position 
             newScore = miniMax(copy, depth - 1, False, alpha, beta)[1]
+            # If the score is good, update
             if newScore > value:
                 value = newScore
                 position = columns
+            # Update alpha
             if value > alpha:
                 alpha = value
             if alpha >= beta:
                 break
         return position, value
     else:
-        value = 999999999999999999999999999999999  # we need to improve our position, so this is the worst possible position to be in
+        value = 999999999  # start with horrible rating (from opponent's perspective)
+        # Do the same but minimizing the player score (simulating the opponent's goal)
         position = random.randint(0, len(eligibleColumns(board)))
         for columns in eligibleColumns(board):
             copy = [[0] * 7 for x in range(6)]
@@ -376,7 +387,7 @@ def miniMax(board, depth, maximizingPlayer, alpha, beta):
                 break
         return position, value
 
-
+# Run the game!
 playGame()
 
 
